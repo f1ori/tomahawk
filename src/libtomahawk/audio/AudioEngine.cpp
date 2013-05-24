@@ -41,6 +41,10 @@
 
 #include <boost/bind.hpp>
 
+#include <phonon/MediaObject>
+#include <phonon/AudioOutput>
+#include <phonon/BackendCapabilities>
+
 #include <QtCore/QUrl>
 #include <QDir>
 #include <QtNetwork/QNetworkReply>
@@ -754,109 +758,109 @@ AudioEngine::onAboutToFinish()
 }
 
 
-void
-AudioEngine::onStateChanged( Phonon::State newState, Phonon::State oldState )
-{
-    tDebug( LOGVERBOSE ) << Q_FUNC_INFO << oldState << newState << m_expectStop << state();
-
-    if ( newState == Phonon::LoadingState )
-    {
-        // We don't emit this state to listeners - yet.
-        m_state = Loading;
-    }
-    if ( newState == Phonon::BufferingState )
-    {
-        if ( m_underrunCount > UNDERRUNTHRESHOLD && !m_underrunNotified )
-        {
-            m_underrunNotified = true;
-            //FIXME: Actually notify
-        }
-        else
-            m_underrunCount++;
-    }
-    if ( newState == Phonon::ErrorState )
-    {
-        stop( UnknownError );
-
-        tDebug() << "Phonon Error:" << m_mediaObject->errorString() << m_mediaObject->errorType();
-
-        emit error( UnknownError );
-        setState( Error );
-    }
-    if ( newState == Phonon::PlayingState )
-    {
-        if ( state() != Paused && state() != Playing )
-        {
-            m_underrunCount = 0;
-            m_underrunNotified = false;
-            emit started( m_currentTrack );
-        }
-
-        setState( Playing );
-    }
-    if ( newState == Phonon::StoppedState && oldState == Phonon::PausedState )
-    {
-        // GStreamer backend hack: instead of going from PlayingState to StoppedState, it traverses PausedState
-        setState( Stopped );
-    }
-
-    if ( oldState == Phonon::PlayingState )
-    {
-        bool stopped = false;
-        switch ( newState )
-        {
-            case Phonon::PausedState:
-            {
-                if ( m_mediaObject && m_currentTrack )
-                {
-                    qint64 duration = m_mediaObject->totalTime() > 0 ? m_mediaObject->totalTime() : m_currentTrack->track()->duration() * 1000;
-                    stopped = ( duration - 1000 < m_mediaObject->currentTime() );
-                }
-                else
-                    stopped = true;
-
-                if ( !stopped )
-                    setState( Paused );
-
-                break;
-            }
-            case Phonon::StoppedState:
-            {
-                stopped = true;
-                break;
-            }
-            default:
-                break;
-        }
-
-        if ( stopped && m_expectStop )
-        {
-            m_expectStop = false;
-            tDebug( LOGVERBOSE ) << "Finding next track.";
-            if ( canGoNext() )
-            {
-                loadNextTrack();
-            }
-            else
-            {
-                if ( !m_playlist.isNull() && m_playlist.data()->retryMode() == Tomahawk::PlaylistModes::Retry )
-                    m_waitingOnNewTrack = true;
-
-                stop();
-            }
-        }
-    }
-
-    if ( newState == Phonon::PausedState || newState == Phonon::PlayingState || newState == Phonon::ErrorState )
-    {
-        tDebug( LOGVERBOSE ) << "Phonon state now:" << newState;
-        if ( m_stateQueue.count() )
-        {
-            /*/ AudioState qState = */ m_stateQueue.dequeue();
-            checkStateQueue();
-        }
-    }
-}
+// void
+// AudioEngine::onStateChanged( Phonon::State newState, Phonon::State oldState )
+// {
+//     tDebug( LOGVERBOSE ) << Q_FUNC_INFO << oldState << newState << m_expectStop << state();
+// 
+//     if ( newState == Phonon::LoadingState )
+//     {
+//         // We don't emit this state to listeners - yet.
+//         m_state = Loading;
+//     }
+//     if ( newState == Phonon::BufferingState )
+//     {
+//         if ( m_underrunCount > UNDERRUNTHRESHOLD && !m_underrunNotified )
+//         {
+//             m_underrunNotified = true;
+//             //FIXME: Actually notify
+//         }
+//         else
+//             m_underrunCount++;
+//     }
+//     if ( newState == Phonon::ErrorState )
+//     {
+//         stop( UnknownError );
+// 
+//         tDebug() << "Phonon Error:" << m_mediaObject->errorString() << m_mediaObject->errorType();
+// 
+//         emit error( UnknownError );
+//         setState( Error );
+//     }
+//     if ( newState == Phonon::PlayingState )
+//     {
+//         if ( state() != Paused && state() != Playing )
+//         {
+//             m_underrunCount = 0;
+//             m_underrunNotified = false;
+//             emit started( m_currentTrack );
+//         }
+// 
+//         setState( Playing );
+//     }
+//     if ( newState == Phonon::StoppedState && oldState == Phonon::PausedState )
+//     {
+//         // GStreamer backend hack: instead of going from PlayingState to StoppedState, it traverses PausedState
+//         setState( Stopped );
+//     }
+// 
+//     if ( oldState == Phonon::PlayingState )
+//     {
+//         bool stopped = false;
+//         switch ( newState )
+//         {
+//             case Phonon::PausedState:
+//             {
+//                 if ( m_mediaObject && m_currentTrack )
+//                 {
+//                     qint64 duration = m_mediaObject->totalTime() > 0 ? m_mediaObject->totalTime() : m_currentTrack->track()->duration() * 1000;
+//                     stopped = ( duration - 1000 < m_mediaObject->currentTime() );
+//                 }
+//                 else
+//                     stopped = true;
+// 
+//                 if ( !stopped )
+//                     setState( Paused );
+// 
+//                 break;
+//             }
+//             case Phonon::StoppedState:
+//             {
+//                 stopped = true;
+//                 break;
+//             }
+//             default:
+//                 break;
+//         }
+// 
+//         if ( stopped && m_expectStop )
+//         {
+//             m_expectStop = false;
+//             tDebug( LOGVERBOSE ) << "Finding next track.";
+//             if ( canGoNext() )
+//             {
+//                 loadNextTrack();
+//             }
+//             else
+//             {
+//                 if ( !m_playlist.isNull() && m_playlist.data()->retryMode() == Tomahawk::PlaylistModes::Retry )
+//                     m_waitingOnNewTrack = true;
+// 
+//                 stop();
+//             }
+//         }
+//     }
+// 
+//     if ( newState == Phonon::PausedState || newState == Phonon::PlayingState || newState == Phonon::ErrorState )
+//     {
+//         tDebug( LOGVERBOSE ) << "Phonon state now:" << newState;
+//         if ( m_stateQueue.count() )
+//         {
+//             /*/ AudioState qState = */ m_stateQueue.dequeue();
+//             checkStateQueue();
+//         }
+//     }
+// }
 
 
 void
@@ -1069,4 +1073,25 @@ AudioEngine::setState( AudioState state )
     m_state = state;
 
     emit stateChanged( state, oldState );
+}
+
+
+qint64
+AudioEngine::currentTime() const
+{
+    return m_mediaObject->currentTime();
+}
+
+
+qint64
+AudioEngine::currentTrackTotalTime() const
+{
+    return m_mediaObject->totalTime();
+}
+
+
+unsigned int
+AudioEngine::volume() const
+{
+    return m_audioOutput->volume() * 100.0;
 }

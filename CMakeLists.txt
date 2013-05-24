@@ -185,8 +185,8 @@ if(BUILD_GUI AND UNIX AND NOT APPLE)
     find_package( X11 )
 endif()
 
-macro_optional_find_package(Phonon 4.5.0)
-macro_log_feature(PHONON_FOUND "Phonon" "The Phonon multimedia library" "http://phonon.kde.org" TRUE "" "")
+macro_optional_find_package(Phonon4Qt5)
+macro_log_feature(Phonon4Qt5_FOUND "Phonon" "The Phonon multimedia library" "http://phonon.kde.org" TRUE "" "")
 if(PHONON_FOUND)
     message(STATUS "Phonon found; ensure that phonon-vlc is at least 0.4")
 endif()
@@ -311,12 +311,6 @@ SET( TOMAHAWK_LIBRARIES tomahawklib )
 ADD_SUBDIRECTORY( thirdparty )
 ADD_SUBDIRECTORY( src )
 ADD_SUBDIRECTORY( admin )
-
-if( BUILD_TESTS )
-    enable_testing()
-    add_subdirectory( tests )
-endif()
-
 
 # Add all targets to the build-tree export set
 set(CMAKE_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/Tomahawk" CACHE PATH  "Installation directory for CMake files")

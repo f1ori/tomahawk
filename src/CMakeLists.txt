@@ -1,5 +1,9 @@
 setup_qt()
 
+if( BUILD_TESTS )
+    enable_testing()
+endif()
+
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/libtomahawk )
 include_directories( ${CMAKE_CURRENT_LIST_DIR}/libtomahawk )
 

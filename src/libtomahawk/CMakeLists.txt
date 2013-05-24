@@ -306,6 +306,7 @@ list(APPEND libSources
     network/Servent.cpp
     network/Connection.cpp
     network/ControlConnection.cpp
+    network/Msg.cpp
 
     playlist/PlaylistUpdaterInterface.cpp
     playlist/dynamic/DynamicPlaylist.cpp
@@ -466,21 +467,24 @@ set_target_properties(
 )
 
 
-qt5_use_modules(tomahawklib Widgets Network Sql WebKitWidgets Concurrent Xml UiTools Svg)
+qt5_use_modules(tomahawklib Widgets Network Sql WebKitWidgets Concurrent Xml UiTools Svg DBus)
 
 IF(QCA2_FOUND)
     LIST(APPEND LINK_LIBRARIES ${QCA2_LIBRARIES} )
 ENDIF(QCA2_FOUND)
 
 IF( UNIX AND NOT APPLE )
-    LIST(APPEND LINK_LIBRARIES ${QT_QTDBUS_LIBRARY} )
+    LIST(APPEND LINK_LIBRARIES ${QT_QTDBUS_LIBRARIES} )
 ENDIF( UNIX AND NOT APPLE )
+
+# message(FATAL_ERROR "narf: ${QTKEYCHAIN_LIBRARIES}")
 
 TARGET_LINK_LIBRARIES( tomahawklib
     LINK_PRIVATE
     # Thirdparty shipped with tomahawk
     ${LIBPORTFWD_LIBRARIES}
     ${QTKEYCHAIN_LIBRARIES}
+    
 
     LINK_PUBLIC
     # External deps

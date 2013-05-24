@@ -28,14 +28,18 @@
 
 #include "DllMacro.h"
 
-#include <phonon/MediaObject>
-#include <phonon/AudioOutput>
-#include <phonon/BackendCapabilities>
-
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 #include <QtCore/QQueue>
 #include <QTemporaryFile>
+
+namespace Phonon
+{
+    class MediaObject;
+    class AudioOutput;
+}
+
+
 
 
 class DLLEXPORT AudioEngine : public QObject
@@ -52,7 +56,7 @@ public:
     ~AudioEngine();
 
     QStringList supportedMimeTypes() const;
-    unsigned int volume() const { return m_audioOutput->volume() * 100.0; } // in percent
+    unsigned int volume() const; // in percent
 
     AudioState state() const { return m_state; }
     bool isPlaying() const { return m_state == Playing; }
@@ -68,8 +72,8 @@ public:
     Tomahawk::result_ptr currentTrack() const { return m_currentTrack; }
     Tomahawk::query_ptr stopAfterTrack() const  { return m_stopAfterTrack; }
 
-    qint64 currentTime() const { return m_mediaObject->currentTime(); }
-    qint64 currentTrackTotalTime() const { return m_mediaObject->totalTime(); }
+    qint64 currentTime() const;
+    qint64 currentTrackTotalTime() const;
 
 public slots:
     void playPause();
@@ -136,7 +140,7 @@ private slots:
     void loadNextTrack();
 
     void onAboutToFinish();
-    void onStateChanged( Phonon::State newState, Phonon::State oldState );
+//     void onStateChanged( Phonon::State newState, Phonon::State oldState );
     void onVolumeChanged( qreal volume ) { emit volumeChanged( volume * 100 ); }
     void timerTriggered( qint64 time );
 

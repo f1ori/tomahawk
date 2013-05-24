@@ -35,6 +35,7 @@
 #include "Source.h"
 
 #define SPOTIFY_API_URL "http://spotikea.tomahawk-player.org/"
+
 #include <qjson/parser.h>
 #include <qjson/serializer.h>
 
