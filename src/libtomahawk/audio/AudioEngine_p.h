@@ -25,31 +25,31 @@ public slots:
     void onStateChanged( Phonon::State newState, Phonon::State oldState );
 
 private:
-    QSharedPointer<QIODevice> m_input;
+    QSharedPointer<QIODevice> input;
 
-    Tomahawk::query_ptr m_stopAfterTrack;
-    Tomahawk::result_ptr m_currentTrack;
-    Tomahawk::playlistinterface_ptr m_playlist;
-    Tomahawk::playlistinterface_ptr m_currentTrackPlaylist;
-    Tomahawk::playlistinterface_ptr m_queue;
+    Tomahawk::query_ptr stopAfterTrack;
+    Tomahawk::result_ptr currentTrack;
+    Tomahawk::playlistinterface_ptr playlist;
+    Tomahawk::playlistinterface_ptr currentTrackPlaylist;
+    Tomahawk::playlistinterface_ptr queue;
 
-    Phonon::MediaObject* m_mediaObject;
-    Phonon::AudioOutput* m_audioOutput;
+    Phonon::MediaObject* mediaObject;
+    Phonon::AudioOutput* audioOutput;
 
-    unsigned int m_timeElapsed;
-    bool m_expectStop;
-    bool m_waitingOnNewTrack;
+    unsigned int timeElapsed;
+    bool expectStop;
+    bool waitingOnNewTrack;
 
-    mutable QStringList m_supportedMimeTypes;
+    mutable QStringList supportedMimeTypes;
 
-    AudioState m_state;
-    QQueue< AudioState > m_stateQueue;
-    QTimer m_stateQueueTimer;
+    AudioState state;
+    QQueue< AudioState > stateQueue;
+    QTimer stateQueueTimer;
 
-    uint_fast8_t m_underrunCount;
-    bool m_underrunNotified;
+    uint_fast8_t underrunCount;
+    bool underrunNotified;
 
-    QTemporaryFile* m_coverTempFile;
+    QTemporaryFile* coverTempFile;
 
     static AudioEngine* s_instance;
 };
